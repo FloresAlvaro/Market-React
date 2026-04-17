@@ -1,49 +1,67 @@
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import type { Product } from "@app/types/product";
 import { useCartStore } from "@store/cartStore";
 import { MainLayout } from "@templates";
 import { Button } from "@atoms";
 import { formatPrice } from "@utils/formatPrice";
-
-// Mock de productos - en producción sería de una API
-const mockProducts: { [key: string]: Product } = {
-  "1": {
-    id: "1",
-    name: "Laptop",
-    price: 999,
-    description:
-      "Laptop de alta performance con procesador de última generación",
-    image: "https://via.placeholder.com/400",
-  },
-  "2": {
-    id: "2",
-    name: "Mouse",
-    price: 25,
-    description: "Mouse inalámbrico de precisión",
-    image: "https://via.placeholder.com/400",
-  },
-  "3": {
-    id: "3",
-    name: "Teclado",
-    price: 75,
-    description: "Teclado mecánico con switches cherry mx",
-    image: "https://via.placeholder.com/400",
-  },
-};
+import { getProductById } from "@services/productService";
 
 export function ProductDetail() {
   const { productId } = useParams<{ productId: string }>();
   const { addItem } = useCartStore();
   const { items } = useCartStore();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const product = productId ? mockProducts[productId] : null;
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!productId) {
+        setError("ID de producto inválido");
+        setLoading(false);
+        return;
+      }
 
-  if (!product) {
+      try {
+        setLoading(true);
+        const fetchedProduct = await getProductById(productId);
+
+        if (fetchedProduct) {
+          setProduct(fetchedProduct);
+          setError(null);
+        } else {
+          setError("Producto no encontrado");
+          setProduct(null);
+        }
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError("Error al cargar el producto");
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <MainLayout cartCount={items.length}>
+        <div className="product-detail">
+          <h2>Cargando producto...</h2>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (error || !product) {
     return (
       <MainLayout cartCount={items.length}>
         <div className="product-detail">
           <h2>Producto no encontrado</h2>
-          <p>Lo sentimos, el producto que buscas no existe.</p>
+          <p>{error || "Lo sentimos, el producto que buscas no existe."}</p>
         </div>
       </MainLayout>
     );

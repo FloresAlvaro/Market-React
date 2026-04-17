@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import type { Product } from "@app/types/product";
 import { Button } from "@atoms";
 
@@ -8,10 +9,34 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <div className="product-card">
       <Link to={`/product/${product.id}`}>
-        <img src={product.image} alt={product.name} />
+        {imageError ? (
+          <div
+            style={{
+              width: "100%",
+              height: "200px",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "4px",
+              marginBottom: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#999",
+            }}
+          >
+            No hay imagen
+          </div>
+        ) : (
+          <img
+            src={product.image}
+            alt={product.name}
+            onError={() => setImageError(true)}
+          />
+        )}
         <h3>{product.name}</h3>
         <p>{product.description}</p>
       </Link>
