@@ -84,6 +84,13 @@
   opacity: 0.8;
 }
 
+.navbar-links {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.favorites-btn,
 .cart-btn {
   background-color: #ff6b6b;
   color: white;
@@ -98,6 +105,7 @@
   transition: background-color 0.3s ease;
 }
 
+.favorites-btn:hover,
 .cart-btn:hover {
   background-color: #ff5252;
 }

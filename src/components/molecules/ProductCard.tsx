@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { Box } from "@mui/material";
 import type { Product } from "@app/types/product";
-import { Button } from "@atoms";
+import { Button, FavoriteButton } from "@atoms";
 
 interface ProductCardProps {
   product: Product;
@@ -12,7 +13,10 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="product-card">
+    <Box className="product-card" sx={{ position: "relative" }}>
+      <Box sx={{ position: "absolute", top: 8, right: 8, zIndex: 10 }}>
+        <FavoriteButton product={product} size="medium" />
+      </Box>
       <Link to={`/product/${product.id}`}>
         {imageError ? (
           <div
@@ -46,6 +50,6 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         onClick={() => onAddToCart(product)}
         variant="primary"
       />
-    </div>
+    </Box>
   );
 }
